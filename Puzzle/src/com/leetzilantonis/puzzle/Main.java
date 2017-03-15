@@ -23,8 +23,21 @@ public class Main {
 	public static int currentArr = -1;
 	public static int pieceCount = 0;
 	public static List<Arrangement> list = new ArrayList<Arrangement>();
+	public static boolean debug = true;
+	public static boolean debugLoop = true;
 
 	public static void main(String[] args) {
+		int a = 5;
+		int b = a--;
+		
+		int c = 5;
+		int d = 1 * ++c;
+		
+		int[] arr = {0,1,2,3,4,5};
+		Main.debug(arr[--c] + " " + arr[b--]);
+		
+		Main.debug(a + " " + b + " " + c + " " + d);
+		
 		pieces.add(new Piece(generate("0,0;0,1;1,1;2,1"), new Coord(0, 1), c("#ff8000"), 1, "A"));
 		pieces.add(new Piece(generate("0,0;1,0;0,1;1,1;2,1"), new Coord(0, 3), c("#e60000"), 2, "B"));
 		pieces.add(new Piece(generate("0,0;0,1;0,2;0,3;-1,3"), new Coord(5, 1), c("#0000cc"), 3, "C"));
@@ -37,6 +50,7 @@ public class Main {
 		pieces.add(new Piece(generate("0,0;1,0;2,0;3,0"), new Coord(5, 0), c("#6600cc"), 10, "J"));
 		pieces.add(new Piece(generate("0,0;0,1;1,0;1,1"), new Coord(9, 3), c("#66ff66"), 11, "K"));
 		pieces.add(new Piece(generate("0,0;0,1;-1,1;1,1;0,2"), new Coord(3, 2), Color.LIGHT_GRAY, 12, "L"));
+		Main.debug("Piece loading done");
 		for (Piece p : pieces) {
 			p.setDrawn(false);
 		}
@@ -52,6 +66,22 @@ public class Main {
 				start(); 
 			}
 		});
+	}
+	
+	public static void debug(String msg) {
+		if (debug) {
+			StackTraceElement s = Thread.currentThread().getStackTrace()[2];
+			String[] split = s.getClassName().split("\\.");
+			System.out.println(split[split.length - 1] + "#" + s.getMethodName() + "-" + s.getLineNumber() + ": " + msg);
+		}
+	}
+	
+	public static void debugLoop(String msg) {
+		if (debugLoop) {
+			StackTraceElement s = Thread.currentThread().getStackTrace()[2];
+			String[] split = s.getClassName().split("\\.");
+			System.out.println(split[split.length - 1] + "#" + s.getMethodName() + "-" + s.getLineNumber() + ": " + msg);
+		}
 	}
 	
 	private static Color c(String s) {
@@ -70,12 +100,12 @@ public class Main {
 		f.getContentPane().add(p);
 		f.pack();
 		f.setVisible(true);
-//		new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-//				list = mainBoard.genNewSolutions();
-//			}
-//		}).start();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				list = mainBoard.genNewSolutions();
+			}
+		}).start();
 		System.out.println(list.toArray());
 	}
 	

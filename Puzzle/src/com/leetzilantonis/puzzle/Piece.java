@@ -7,7 +7,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class Piece {
 
@@ -240,13 +243,13 @@ public class Piece {
 
 	// Assumes same origin
 	public boolean sameOrient(Piece p) {
-		//System.out.println("\nNEW");
-		if (p.origin == this.origin)
-			return false;
+		//Main.debug("\nNEW");
+//		if (p.origin == this.origin)
+//			return false;
 		List<Coord> s1 = new ArrayList<Coord>(p.points);
-		//System.out.println(s1.toString() + " - 1");
+		//Main.debug(s1.toString() + " - 1");
 		List<Coord> s2 = new ArrayList<Coord>(this.points);
-		//System.out.println(s2.toString() + " - 2");
+		//Main.debug(s2.toString() + " - 2");
 		
 //		Coord o = new Coord(0, 0);
 //		int index = -1;
@@ -255,7 +258,7 @@ public class Piece {
 //		while (it.hasNext()) {
 //			Coord next = it.next();
 //			if (next.equals(o)) {
-//				System.out.println(next.toString() + " : " + o.toString());
+//				Main.debug(next.toString() + " : " + o.toString());
 //				index = counter;
 //				break;
 //			}
@@ -263,22 +266,22 @@ public class Piece {
 //		}
 ////		for (Coord ct : s1.iterator()) {
 ////			if (s1[i].equals(o)) {
-////				System.out.println(p.points.get(i).toString() + " : " + o.toString());
+////				Main.debug(p.points.get(i).toString() + " : " + o.toString());
 ////				index = i;
 ////				break;
 ////			}
 ////			counter++;
 ////		}
-//		System.out.println(index + " <- INDEX");
+//		Main.debug(index + " <- INDEX");
 //		o = this.points.get(index);
-//		System.out.println(o.toString() + " <- ADJUST");
+//		Main.debug(o.toString() + " <- ADJUST");
 //		Set<Coord> temp = new HashSet<Coord>();
 //		for (Coord c : s1) {
-//			System.out.println(c.x + ":" + c.y + " - " + (c.x + o.x) + ":" + (c.y + o.y) + " <- NEW");
+//			Main.debug(c.x + ":" + c.y + " - " + (c.x + o.x) + ":" + (c.y + o.y) + " <- NEW");
 //			temp.add(new Coord((c.x + o.x), (c.y + o.y)));
 //		}
-//		System.out.println(temp.toString());
-//		System.out.println("EQUALS: " + temp.equals(s2));
+//		Main.debug(temp.toString());
+//		Main.debug("EQUALS: " + temp.equals(s2));
 		
 		
 		// Top Left and Bottom right Adjustments
@@ -290,7 +293,7 @@ public class Piece {
 		List<Coord> rc2 = new ArrayList<Coord>();
 		
 		for (Coord c : s1) {
-			//System.out.println("X: " + c.x + ":" + tl1.x + " - Y: " + c.y + ":" + tl1.y);
+			//Main.debug("X: " + c.x + ":" + tl1.x + " - Y: " + c.y + ":" + tl1.y);
 			int l = c.x < tl1.x ? c.x : tl1.x;
 			int t = c.y < tl1.y ? c.y : tl1.y;
 			tl1 = new Coord(l, t);
@@ -298,15 +301,15 @@ public class Piece {
 		tl1 = new Coord(0 - tl1.x, 0 - tl1.y);
 		
 		for (Coord c : s2) {
-			//System.out.println("X: " + c.x + ":" + tl2.x + " - Y: " + c.y + ":" + tl2.y);
+			//Main.debug("X: " + c.x + ":" + tl2.x + " - Y: " + c.y + ":" + tl2.y);
 			int l = c.x < tl2.x ? c.x : tl2.x;
 			int t = c.y < tl2.y ? c.y : tl2.y;
 			tl2 = new Coord(l, t);
 		}
 		tl2 = new Coord(0 - tl2.x, 0 - tl2.y);
 		
-		//System.out.println(tl1.toString() + " - 1");
-		//System.out.println(tl2.toString() + " - 2");
+		//Main.debug(tl1.toString() + " - 1");
+		//Main.debug(tl2.toString() + " - 2");
 		
 		for (Coord c : s1) {
 			rc1.add(new Coord(c.x + tl1.x, c.y + tl1.y));
@@ -330,20 +333,43 @@ public class Piece {
 		for (int i = 0; i < t1.length; i++) {
 			//System.out.print("[" + t1[i].x + "," + t1[i].y + "]");
 		}
-		//System.out.println("]");
+		//Main.debug("]");
 		//System.out.print("[");
 		for (int i = 0; i < t2.length; i++) {
 			//System.out.print("[" + t2[i].x + "," + t2[i].y + "]");
 		}
-		//System.out.println("]");
-		//System.out.println(rc1.toString() + " - 1");
-		//System.out.println(rc2.toString() + " - 2");
-		//System.out.println(Arrays.toString(t1).equals(Arrays.toString(t2)));
+		//Main.debug("]");
+		//Main.debug(rc1.toString() + " - 1");
+		//Main.debug(rc2.toString() + " - 2");
+		//Main.debug(Arrays.toString(t1).equals(Arrays.toString(t2)) + "");
 		return Arrays.toString(t1).equals(Arrays.toString(t2));
 	}
 
 	public int getRotation() {
 		return this.orientation;
+	}
+	
+	public void resetOrigin() {
+		List<Coord> s = new ArrayList<Coord>(this.points);
+		Coord tl = new Coord(0, 0);
+		
+		// Reconstructed shapes to align
+		List<Coord> rc = new ArrayList<Coord>();
+		
+		for (Coord c : s) {
+			//Main.debug("X: " + c.x + ":" + tl1.x + " - Y: " + c.y + ":" + tl1.y);
+			int l = c.x < tl.x ? c.x : tl.x;
+			int t = c.y > tl.y ? c.y : tl.y;
+			tl = new Coord(l, t);
+		}
+		tl = new Coord(0 - tl.x, 0 - tl.y);
+		
+		for (Coord c : s) {
+			rc.add(new Coord(c.x + tl.x, c.y + tl.y));
+		}
+		
+		this.origin = new Point(this.origin.x + tl.x, this.origin.y + tl.y);
+		this.points = rc;
 	}
 
 	@Override

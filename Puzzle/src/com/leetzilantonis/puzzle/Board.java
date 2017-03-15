@@ -77,17 +77,17 @@ public class Board {
 					for (Coord offset : offsets) {
 						Coord test = new Coord(o.x + offset.x, o.y + offset.y);
 						if (test.equals(point)) {
-							System.out.println("SOMETHING: " + test.x + " : " + test.y);
+							//Main.debugLoop("SOMETHING: " + test.x + " : " + test.y);
 							return p;
 						}
 					}
 				}
 			} else {
-				//System.out.println("Y OUT");
+				//Main.debug("Y OUT");
 				return new Piece(Main.generate("0,0"), new Coord(-1, -1), Color.BLACK, 100, "Z");
 			}
 		} else {
-			//System.out.println("X OUT");
+			//Main.debug("X OUT");
 			return new Piece(Main.generate("0,0"), new Coord(-1, -1), Color.BLACK, 100, "Z");
 		}
 		return null;
@@ -120,15 +120,16 @@ public class Board {
 		trans.add(p8);
 		List<Piece> temp = new ArrayList<Piece>();
 		for (Piece pi : trans) {
-			//System.out.println("LOOP");
+			//Main.debug("LOOP");
 			if (temp.isEmpty()) {
 				temp.add(pi);
 				continue;
 			}
 			boolean c = false;
 			for (Piece pie : temp) {
+				pie.resetOrigin();
 				if (pie.sameOrient(pi)) {
-					System.out.println("MATCH");
+					Main.debug("MATCH");
 					c = true;
 					break;
 				}
@@ -152,21 +153,21 @@ public class Board {
 	public boolean positionValid(Arrangement a, Piece piece, Coord pos) {
 		for (Coord p : piece.getOffsets()) {
 			Coord test = new Coord(pos.x + p.x, pos.y + p.y);
-			//			System.out.println(test.toString());
-			//			System.out.println(origin.x + " " + origin.y);
-			//			System.out.println(width + " " + height);
+			//			Main.debug(test.toString());
+			//			Main.debug(origin.x + " " + origin.y);
+			//			Main.debug(width + " " + height);
 			if (test.x < origin.x + width && test.x >= origin.x) {
 				if (test.y < origin.y + height && test.y >= origin.y) {
 					if (a.isTaken(test)) {
-						//System.out.println("TAKEN FALSE");
+						//Main.debug("TAKEN FALSE");
 						return false;
 					}
 				} else {
-					//System.out.println("Y OUT");
+					//Main.debug("Y OUT");
 					return false;
 				}
 			} else {
-				//System.out.println("X OUT");
+				//Main.debug("X OUT");
 				return false;
 			}
 		}
@@ -182,9 +183,9 @@ public class Board {
 				for (int iy=0; iy < height; iy++) {
 					Coord temp = new Coord(ix + origin.x, iy + origin.y);
 					if (this.positionValid(p, temp)) {
-						//System.out.println("POSITION VALID");
+						//Main.debug("POSITION VALID");
 						if (!tempL.contains(temp)) {
-							//System.out.println("Exists NOT");
+							//Main.debug("Exists NOT");
 							tempL.add(temp);
 						}
 					}
@@ -198,19 +199,19 @@ public class Board {
 	}
 
 	public List<Arrangement> getAllPositions(Piece piece, List<Arrangement> arr) {
-		System.out.println("BEFORE: " + arr.size());
+		Main.debug("BEFORE: " + arr.size());
 		if (arr.isEmpty()) {
-			//System.out.println("EMPTY");
-			System.out.println(this.allTranslations(piece).size() + " PS");
+			Main.debug("EMPTY");
+			Main.debug(this.allTranslations(piece).size() + " PS");
 			for (Piece p : this.allTranslations(piece)) {
-				System.out.println(p.toString());
+				Main.debug(p.toString());
 				for (int ix=0; ix < width;ix++) {
 					for (int iy=0; iy < height; iy++) {
 						Coord c = new Coord(ix + origin.x, iy + origin.y);
 						Arrangement a = new Arrangement(new HashMap<Piece, Coord>());
-						//System.out.println(ix + " : " + iy);
+						//Main.debug(ix + " : " + iy);
 						if (this.positionValid(p, c)) {
-							//System.out.println("VALID");
+							//Main.debug("VALID");
 							a.addPiece(p, c);
 							synchronized (a) {
 								if (this.time + 1000 < System.currentTimeMillis()) {
@@ -223,34 +224,34 @@ public class Board {
 					}
 				}
 			}
-			System.out.println("AFTER1: " + arr.size());
+			Main.debug("AFTER1: " + arr.size());
 			return arr;
 		}
 		List<Arrangement> f = new ArrayList<Arrangement>();
 		for (Arrangement a : arr) {
-			//System.out.println(p.toString());
+			//Main.debug(p.toString());
 			for (int ix=0; ix<width;ix++) {
 				for (int iy=0; iy<height; iy++) {
 					for (Piece p : this.allTranslations(piece)) {
 						Coord c = new Coord(ix + origin.x, iy + origin.y);
 						if (this.positionValid(a, p, c)) {
-							//System.out.println("VALID");
+							//Main.debug("VALID");
 							a.addPiece(p, c);
 //							synchronized (a) {
 //								if (this.time + 1000 < System.currentTimeMillis()) {
-//									System.out.println("TRUE");
+//									Main.debug("TRUE");
 //									this.time = System.currentTimeMillis();
 //									this.setArrangement(a);
 //								}
 //							}
 							f.add(a);
-							//System.out.println(f.size() + " ID");
+							//Main.debug(f.size() + " ID");
 						}
 					}
 				}
 			}
 		}
-		System.out.println("AFTER2: " + f.size());
+		Main.debug("AFTER2: " + f.size());
 		return f;
 	}
 
@@ -267,7 +268,7 @@ public class Board {
 
 	public List<Arrangement> genNewSolutions() {
 		for (Piece p : this.piecesLeft) {
-			System.out.println(p.toString());
+			//Main.debug(p.toString());
 		}
 		this.arr = new ArrayList<Arrangement>();
 		return this.genSolutions();
@@ -281,7 +282,7 @@ public class Board {
 			List<Arrangement> finalList = new ArrayList<Arrangement>();
 			for (Arrangement a : arr) {
 				if (a.getRawData().size() == Main.pieceCount) {
-					System.out.println("CHECK 1");
+					Main.debug("CHECK 1");
 					finalList.add(a);
 				}
 			}
@@ -290,7 +291,7 @@ public class Board {
 			Piece p = this.piecesLeft.get(0);
 			List<Arrangement> pos = this.getAllPositions(p, arr);
 			if (pos.isEmpty()) {
-				System.out.println("NULL");
+				Main.debug("NULL");
 				return null; // Not enough grid space to fit the piece
 			}
 			this.arr = pos;
@@ -298,14 +299,14 @@ public class Board {
 			if (this.piecesLeft.isEmpty()) {
 				List<Arrangement> finalList = new ArrayList<Arrangement>();
 				for (Arrangement a : arr) {
-					System.out.println(a.getRawData().size());
+					Main.debug("" + a.toString());
 					if (a.getRawData().size() == Main.pieceCount) {
 						finalList.add(a);
 					}
 				}
 				return finalList;
 			}
-			System.out.println("NEW");
+			Main.debug("NEW");
 			return genSolutions();
 		}
 	}
@@ -317,9 +318,9 @@ public class Board {
 		if (this.piecesLeft.isEmpty()) {
 			List<Arrangement> finalList = new ArrayList<Arrangement>();
 			for (Arrangement a : arr) {
-				System.out.println(a.getRawData().size());
+				Main.debug("" + a.getRawData().size());
 				if (a.getRawData().size() == Main.pieceCount) {
-					System.out.println("CHECK 3");
+					Main.debug("CHECK 3");
 					finalList.add(a);
 				}
 			}
@@ -328,9 +329,9 @@ public class Board {
 			if (ignoreSpares) {
 				List<Arrangement> finalList = new ArrayList<Arrangement>();
 				for (Arrangement a : arr) {
-					System.out.println(a.getRawData().size());
+					Main.debug("" + a.getRawData().size());
 					if (a.getRawData().size() == Main.pieceCount) {
-						System.out.println("CHECK 4");
+						Main.debug("CHECK 4");
 						finalList.add(a);
 					}
 				}
