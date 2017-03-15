@@ -1,0 +1,103 @@
+
+	public boolean sameOrient(Piece p) {
+		//Main.debug("\nNEW");
+		if (p.origin == this.origin)
+			return false;
+		List<Coord> s1 = new ArrayList<Coord>(p.points);
+		//Main.debug(s1.toString() + " - 1");
+		List<Coord> s2 = new ArrayList<Coord>(this.points);
+		//Main.debug(s2.toString() + " - 2");
+		
+//		Coord o = new Coord(0, 0);
+//		int index = -1;
+//		int counter = 0;
+//		Iterator<Coord> it = s1.iterator();
+//		while (it.hasNext()) {
+//			Coord next = it.next();
+//			if (next.equals(o)) {
+//				Main.debug(next.toString() + " : " + o.toString());
+//				index = counter;
+//				break;
+//			}
+//			counter++;
+//		}
+////		for (Coord ct : s1.iterator()) {
+////			if (s1[i].equals(o)) {
+////				Main.debug(p.points.get(i).toString() + " : " + o.toString());
+////				index = i;
+////				break;
+////			}
+////			counter++;
+////		}
+//		Main.debug(index + " <- INDEX");
+//		o = this.points.get(index);
+//		Main.debug(o.toString() + " <- ADJUST");
+//		Set<Coord> temp = new HashSet<Coord>();
+//		for (Coord c : s1) {
+//			Main.debug(c.x + ":" + c.y + " - " + (c.x + o.x) + ":" + (c.y + o.y) + " <- NEW");
+//			temp.add(new Coord((c.x + o.x), (c.y + o.y)));
+//		}
+//		Main.debug(temp.toString());
+//		Main.debug("EQUALS: " + temp.equals(s2));
+		
+		
+		// Top Left and Bottom right Adjustments
+		Coord tl1 = new Coord(0, 0);
+		Coord tl2 = new Coord(0, 0);
+		
+		// Reconstructed shapes to align
+		List<Coord> rc1 = new ArrayList<Coord>();
+		List<Coord> rc2 = new ArrayList<Coord>();
+		
+		for (Coord c : s1) {
+			//Main.debug("X: " + c.x + ":" + tl1.x + " - Y: " + c.y + ":" + tl1.y);
+			int l = c.x < tl1.x ? c.x : tl1.x;
+			int t = c.y < tl1.y ? c.y : tl1.y;
+			tl1 = new Coord(l, t);
+		}
+		tl1 = new Coord(0 - tl1.x, 0 - tl1.y);
+		
+		for (Coord c : s2) {
+			//Main.debug("X: " + c.x + ":" + tl2.x + " - Y: " + c.y + ":" + tl2.y);
+			int l = c.x < tl2.x ? c.x : tl2.x;
+			int t = c.y < tl2.y ? c.y : tl2.y;
+			tl2 = new Coord(l, t);
+		}
+		tl2 = new Coord(0 - tl2.x, 0 - tl2.y);
+		
+		//Main.debug(tl1.toString() + " - 1");
+		//Main.debug(tl2.toString() + " - 2");
+		
+		for (Coord c : s1) {
+			rc1.add(new Coord(c.x + tl1.x, c.y + tl1.y));
+		}
+		
+		for (Coord c : s2) {
+			rc2.add(new Coord(c.x + tl2.x, c.y + tl2.y));
+		}
+		
+		Coord[] t1 = new Coord[rc1.size()];
+		for (int i = 0; i < rc1.size(); i++) {
+			t1[i] = rc1.get(i);
+		}
+		Arrays.sort(t1);
+		Coord[] t2 = new Coord[rc2.size()];
+		for (int i = 0; i < rc2.size(); i++) {
+			t2[i] = rc2.get(i);
+		}
+		Arrays.sort(t2);
+		//System.out.print("[");
+		for (int i = 0; i < t1.length; i++) {
+			//System.out.print("[" + t1[i].x + "," + t1[i].y + "]");
+		}
+		//Main.debug("]");
+		//System.out.print("[");
+		for (int i = 0; i < t2.length; i++) {
+			//System.out.print("[" + t2[i].x + "," + t2[i].y + "]");
+		}
+		//Main.debug("]");
+		//Main.debug(rc1.toString() + " - 1");
+		//Main.debug(rc2.toString() + " - 2");
+		//Main.debug(Arrays.toString(t1).equals(Arrays.toString(t2)));
+		return Arrays.toString(t1).equals(Arrays.toString(t2));
+	}
